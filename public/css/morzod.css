@@ -1,0 +1,12 @@
+#ticker_list div {
+	cursor: pointer;
+	margin-top: 5px;
+}
+
+#ticker_list div.loaded {
+	background: #AAFFAA;
+}
+
+#ticker_list div.loading {
+	background: #AAAAFF;
+}

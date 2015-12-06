@@ -1,0 +1,11 @@
+{
+	"name": "morzod",
+	"description": "Browser based role playing.",
+	"copyright": "Copyright © 2015, Anders Andersson",
+	"authors": ["Anders Andersson"],
+	"dependencies": {
+		"vibe-d": ">=0.7.26",
+		"ddbc": ">=0.2.24"
+	},
+	"versions": ["VibeDefaultMain"]
+}
