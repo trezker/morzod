@@ -2,4 +2,4 @@
 %project=morzod
 
 appuser 2015-12-06T07:25:30Z Anders Andersson <trezker@gmail.com> # Create application user
-user 2015-12-06T13:06:23Z Anders Andersson <trezker@gmail.com> # Create user table
+user [appuser] 2015-12-06T13:06:23Z Anders Andersson <trezker@gmail.com> # Create user table
