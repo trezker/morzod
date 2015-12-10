@@ -1,6 +1,7 @@
 //import std.stdio;
 import std.c.stdlib;
 import std.file;
+import std.json;
 import vibe.d;
 import ddbc.core;
 import ddbc.common;
@@ -8,9 +9,13 @@ import ddbc.drivers.mysqlddbc;
 import ddbc.pods;
 
 shared static this() {
-	if(!databaseSetup()) {
-		exit(-1);
-	}
+	runTask({
+		if(!databaseSetup()) {
+			logInfo("Database setup failed.");
+			exit(-1);
+		}
+	});
+	
 
 	auto settings = new HTTPServerSettings;
 	settings.port = 8080;
@@ -28,15 +33,41 @@ shared static this() {
 }
 
 bool databaseSetup() {
-	if(!exists("database.ini")) {
-		logInfo("Missing database.ini");
+	try
+	{
+		if(!exists("database.json")) {
+			logInfo("Missing database.json");
+			return false;
+		}
+		string json = readText("database.json");
+		logInfo(json);
+		JSONValue[string] document = parseJSON(json).object;
+		JSONValue[string] settings = document["dev"].object;
+		auto host = settings["host"].str;
+		auto port = to!ushort(settings["port"].integer);
+		auto database = settings["database"].str;
+		auto user = settings["user"].str;
+		auto password = settings["password"].str;
 
-		logInfo("Database setup failed.");
-		return false;
+		auto driver = new MySQLDriver();
+	    auto url = MySQLDriver.generateUrl(host, port, database);
+	    auto params = MySQLDriver.setUserAndPassword(user, password);
+		// create connection pool
+		DataSource ds = new ConnectionPoolDataSourceImpl(driver, url, params);
+		// creating Connection
+		auto conn = ds.getConnection();
+		scope(exit) conn.close();
+		// creating Statement
+		auto stmt = conn.createStatement();
+		scope(exit) stmt.close();
+		// reading DB
+		auto rs = stmt.executeQuery("select id, name, pass, salt, created from user;");
+		while (rs.next())
+		    logInfo(to!string(rs.getString("name")));
 	}
-	auto driver = new MySQLDriver();
-    auto url = MySQLDriver.generateUrl("localhost", 3306, "test_db");
-    auto params = MySQLDriver.setUserAndPassword("root", "testpassword");
+	catch(Exception e) {
+		logInfo(e.msg);
+	}
     return true;
 }
 
