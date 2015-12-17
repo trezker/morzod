@@ -1,7 +1,11 @@
-function test() {
-	var data = {
-		func: "test"
-	};
+$(function() {
+	$.getScript("/js/front.js")
+	.done(function( script, textStatus ) {
+		load_front();
+	});
+});
+
+function ajax_post(data, done) {
 	$.ajax({
 		method		: "POST",
 		dataType   	: 'json',
@@ -9,13 +13,15 @@ function test() {
 		url: "/ajax",
 		data: JSON.stringify(data)
 	})
-	.done(function(data) {
-		alert(data);
-	});
+	.done(done);
 }
 
-$(function() {
-	$("#test").on("click", function(e) {
-		test();
-	});
-});
+function ajax_html(url, done) {
+	$.ajax({
+		method		: "GET",
+		dataType   	: 'html',
+		contentType	: 'application/json; charset=UTF-8',
+		url: url
+	})
+	.done(done);
+}
