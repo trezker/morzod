@@ -61,9 +61,11 @@ bool databaseSetup() {
 		auto stmt = conn.createStatement();
 		scope(exit) stmt.close();
 		// reading DB
+		/*
 		auto rs = stmt.executeQuery("select id, name, pass, salt, created from user;");
 		while (rs.next())
 		    logInfo(to!string(rs.getString("name")));
+		*/
 	}
 	catch(Exception e) {
 		logInfo(e.msg);
