@@ -51,20 +51,28 @@ public:
 		try {
 			string func = req.json.func.to!string;
 			switch(func) {
-				case "get_logged_in_user":
+				case "get_current_user_id":
 					res.writeJsonBody(false);
+					break;
+				case "login_password":
+					res.writeJsonBody("Woop");
 					break;
 				case "get_user":
 					auto conn = datasource.getConnection();
 					scope(exit) conn.close();
-					auto stmt = conn.createStatement();
-					scope(exit) stmt.close();
 
-					auto rs = stmt.executeQuery("select id, name, pass, salt, created from user;");
-					string name;
+					auto prep = conn.prepareStatement("
+						select id, name, created 
+						from user 
+						where id=?;
+					");
+					scope(exit) prep.close();
+					prep.setUlong(1, 2);
+					auto rs = prep.executeQuery();
+
+					int name;
 					while (rs.next()) {
-						name = to!string(rs.getString("name"));
-					    logInfo(name);
+						name = to!int(rs.getInt("id"));
 					}
 					res.writeJsonBody(name);
 					break;
