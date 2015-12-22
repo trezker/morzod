@@ -2,16 +2,38 @@
 import std.c.stdlib;
 import std.file;
 import std.json;
-import vibe.d;
+import std.functional;
+import std.conv;
+import vibe.appmain;
+import vibe.core.core;
+import vibe.core.log;
+import vibe.http.router;
+import vibe.http.server;
+import vibe.http.fileserver;
 import ddbc.core;
 import ddbc.common;
 import ddbc.drivers.mysqlddbc;
 import ddbc.pods;
+import morzod;
 
 class Morzo_server {
 private:
 	DataSource datasource;
+	User_model user_model;
+	alias Model_callback = void delegate(HTTPServerRequest req, HTTPServerResponse res);
+	Model_callback[string][string] models;
 public:
+	bool setup() {
+		if(!databaseSetup()) {
+			logInfo("Database setup failed.");
+			return false;
+		}
+
+		user_model = new User_model;
+		user_model.setup(datasource, models);
+		return true;
+	}
+
 	bool databaseSetup() {
 		try
 		{
@@ -49,14 +71,16 @@ public:
 
 	void ajax(HTTPServerRequest req, HTTPServerResponse res) {
 		try {
-			string func = req.json.func.to!string;
+			string model = req.json.model.to!string;
+			string method = req.json.method.to!string;
+			if(model in models && method in models[model]) {
+				models[model][method] (req, res);
+			}
+			else {
+				res.writeJsonBody("Model/method does not exist");
+			}
+			/*
 			switch(func) {
-				case "get_current_user_id":
-					res.writeJsonBody(false);
-					break;
-				case "login_password":
-					res.writeJsonBody("Woop");
-					break;
 				case "get_user":
 					auto conn = datasource.getConnection();
 					scope(exit) conn.close();
@@ -76,10 +100,8 @@ public:
 					}
 					res.writeJsonBody(name);
 					break;
-				default:
-					res.writeJsonBody(false);
-					break;
 			}
+			*/
 		}
 		catch(Exception e) {
 			logInfo(e.msg);
@@ -91,8 +113,7 @@ shared static this() {
 	auto morzo_server = new Morzo_server;
 
 	runTask({
-		if(!morzo_server.databaseSetup()) {
-			logInfo("Database setup failed.");
+		if(!morzo_server.setup()) {
 			exit(-1);
 		}
 	});
