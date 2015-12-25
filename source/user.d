@@ -4,8 +4,6 @@ import vibe.http.server;
 import ddbc.core;
 import morzod.server;
 
-alias Request_delegate = void delegate(HTTPServerRequest req, HTTPServerResponse res);
-
 class User_model {
 	DataSource datasource;
 
