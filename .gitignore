@@ -2,3 +2,6 @@
 dub.selections.json
 database.json
 morzod
+test
+test.o
+test.d

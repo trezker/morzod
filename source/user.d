@@ -1,17 +1,24 @@
-module morzod;
+module morzod.user;
 
 import vibe.http.server;
 import ddbc.core;
+import morzod.server;
 
-alias Model_callback = void delegate(HTTPServerRequest req, HTTPServerResponse res);
+alias Request_delegate = void delegate(HTTPServerRequest req, HTTPServerResponse res);
 
 class User_model {
 	DataSource datasource;
 
-	void setup(DataSource ds, ref Model_callback[string][string] models) {
+	void setup(DataSource ds, ref Model_method[string][string] models) {
 		datasource = ds;
-		models["user"]["get_current_user_id"] = &this.get_current_user_id;
-		models["user"]["login_password"] = &this.login_password;
+		models["user"]["get_current_user_id"] = Model_method(
+			[],
+			&this.get_current_user_id
+		);
+		models["user"]["login_password"] = Model_method(
+			[],
+			&this.login_password
+		);
 	}
 
 	void get_current_user_id(HTTPServerRequest req, HTTPServerResponse res) {
