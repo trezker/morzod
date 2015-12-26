@@ -1,5 +1,8 @@
 $(function() {
-	$.getScript("/js/test/user_test.js");
+	$.getScript("/js/test/user_test.js").fail(function( jqxhr, settings, exception ) {
+    	console.log( "Triggered ajaxError handler." );
+    	console.log( exception );
+	});
 });
 
 function test_assert(cond) {
