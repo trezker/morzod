@@ -17,13 +17,33 @@ class User_model {
 			[],
 			&this.login_password
 		);
+		models["user"]["logout"] = Model_method(
+			[],
+			&this.logout
+		);
 	}
 
 	void get_current_user_id(HTTPServerRequest req, HTTPServerResponse res) {
-		res.writeJsonBody(false);
+		if(!req.session) {
+			res.writeJsonBody(false);
+			return;
+		}
+		auto id = req.session.get!int("id");
+		res.writeJsonBody(id);
 	}
 
 	void login_password(HTTPServerRequest req, HTTPServerResponse res) {
-		res.writeJsonBody(false);
+		auto session = res.startSession();
+		session.set("id", 1);
+		//session.set("username", req.form["username"]);
+		//session.set("password", req.form["password"]);
+		res.writeJsonBody(true);
+	}
+
+	void logout(HTTPServerRequest req, HTTPServerResponse res) {
+		if(req.session) {
+			res.terminateSession();
+		}
+		res.writeJsonBody(true);
 	}
 }

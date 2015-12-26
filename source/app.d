@@ -20,9 +20,11 @@ shared static this() {
 	settings.port = 8080;
 	settings.bindAddresses = ["::1", "127.0.0.1"];
 	settings.errorPageHandler = toDelegate(&morzo_server.errorPage);
+	settings.sessionStore = new MemorySessionStore;
 
 	auto router = new URLRouter;
 	router.get("/", &morzo_server.index);
+	router.get("/test", &morzo_server.test);
 	router.post("/ajax", &morzo_server.ajax);
 	router.get("/*", serveStaticFiles("./public/"));
 	

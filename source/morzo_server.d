@@ -83,6 +83,10 @@ public:
 		res.render!("index.dt", req);
 	}
 
+	void test(HTTPServerRequest req, HTTPServerResponse res) {
+		res.render!("test.dt", req);
+	}
+
 	void ajax(HTTPServerRequest req, HTTPServerResponse res) {
 		try {
 			string model = req.json.model.to!string;

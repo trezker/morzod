@@ -1,0 +1,17 @@
+$(function() {
+	$.getScript("/js/test/user_test.js");
+});
+
+function test_assert(cond) {
+	if(!cond) {
+		try {
+			throw new Error();
+		}
+		catch(e) {
+			var stackLine = e.stack.split('\n')[1];
+			var testname = stackLine.substring(0, stackLine.indexOf("/"));
+			var position = stackLine.substring(stackLine.indexOf(" "));
+			$("body").append("<p>ERROR: " + testname + position + "</p>");
+		}
+	}
+}
