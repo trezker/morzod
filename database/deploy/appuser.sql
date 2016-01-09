@@ -2,6 +2,6 @@
 
 BEGIN;
 
-CREATE USER morzod;
+CREATE USER 'morzod'@'localhost';
 
 COMMIT;

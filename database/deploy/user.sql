@@ -11,6 +11,6 @@ create table user (
 	PRIMARY KEY (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-grant select on table user to morzod;
+grant select, insert, update, delete on table user to 'morzod'@'localhost';
 
 COMMIT;

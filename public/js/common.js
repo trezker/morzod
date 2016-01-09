@@ -6,7 +6,19 @@ function ajax_post(data, done) {
 		url: "/ajax",
 		data: JSON.stringify(data)
 	})
-	.done(done);
+	.success(done);
+}
+
+function ajax_post_sync(data, done) {
+    $.ajax({
+        sync        : false,
+        method      : "POST",
+        dataType    : 'json',
+        contentType : 'application/json; charset=UTF-8',
+        url: "/ajax",
+        data: JSON.stringify(data)
+    })
+    .success(done);
 }
 
 function ajax_html(url, done) {

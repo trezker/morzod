@@ -21,6 +21,10 @@ class User_model {
 			[],
 			&this.logout
 		);
+		models["user"]["create_user"] = Model_method(
+			[],
+			&this.logout
+		);
 	}
 
 	void get_current_user_id(HTTPServerRequest req, HTTPServerResponse res) {
@@ -45,5 +49,32 @@ class User_model {
 			res.terminateSession();
 		}
 		res.writeJsonBody(true);
+	}
+
+	void create_user(HTTPServerRequest req, HTTPServerResponse res) {
+		try {
+			string username = req.json.username.to!string;
+			string password = req.json.password.to!string;
+
+			auto conn = datasource.getConnection();
+			scope(exit) conn.close();
+
+			auto prep = conn.prepareStatement("
+				insert into user(name, password)
+				values(?, ?)
+			");
+			scope(exit) prep.close();
+			prep.setString(1, username);
+			prep.setString(2, password);
+			auto rs = prep.executeUpdate();
+
+			res.writeJsonBody(true);
+		}
+		catch(SQLException ex) {
+			res.writeJsonBody(false);
+		}
+		catch(Exception ex) {
+			res.writeJsonBody(false);
+		}
 	}
 }
