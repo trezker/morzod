@@ -13,4 +13,6 @@ CREATE TABLE morzod.user (
   CONSTRAINT "unique name" UNIQUE (name)
 );
 
+GRANT SELECT, UPDATE, INSERT, DELETE ON morzod.user TO morzo;
+
 COMMIT;
