@@ -43,6 +43,14 @@ class User_model {
 	}
 
 	void login_password(HTTPServerRequest req, HTTPServerResponse res) {
+		//Do not allow double login, must log out first.
+		//But we'll help out by terminating the old session to get a clean state.
+		if(req.session) {
+			res.terminateSession();
+			res.writeJsonBody(false);
+			return;
+		}
+
 		string username = req.json.username.to!string;
 		string password = req.json.password.to!string;
 
