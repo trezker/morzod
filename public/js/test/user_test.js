@@ -37,5 +37,24 @@ function test_login_password() {
 	});
 }
 
+function test_unique_username() {
+	ajax_post_sync({
+		'model': 'user', 
+		'method': 'create_user',
+		'password': 'testpass',
+		'username': 'testuser'
+	}, function(data) {
+		ajax_post_sync({
+			'model': 'user', 
+			'method': 'create_user',
+			'password': 'testpass',
+			'username': 'testuser'
+		}, function(data) {
+			test_assert(data == false);
+		});
+	});
+}
+
 test_logout();
 test_login_password();
+test_unique_username();

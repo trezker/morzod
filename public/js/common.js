@@ -11,7 +11,7 @@ function ajax_post(data, done) {
 
 function ajax_post_sync(data, done) {
     $.ajax({
-        sync        : false,
+        async        : false,
         method      : "POST",
         dataType    : 'json',
         contentType : 'application/json; charset=UTF-8',
