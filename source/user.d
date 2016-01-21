@@ -59,10 +59,23 @@ class User_model {
 
 		auto conn = datasource.getConnection();
 		scope(exit) conn.close();
-		
+
+		//Check if username is taken
+		auto prep = conn.prepareStatement("
+			select 1 from user where name = ?
+		");
+
+		prep.setString(1, username);
+		auto rs = prep.executeQuery();
+		if(rs.next())
+		{
+			res.writeJsonBody(false);
+		}
+
+		//Create the user
 		string salt = get_random_string(32);
 
-		auto prep = conn.prepareStatement("
+		prep = conn.prepareStatement("
 			insert into user(name, pass, salt)
 			values(?, ?, ?)
 		");
@@ -70,7 +83,7 @@ class User_model {
 		prep.setString(1, username);
 		prep.setString(2, password);
 		prep.setString(3, salt);
-		auto rs = prep.executeUpdate();
+		prep.executeUpdate();
 
 		res.writeJsonBody(true);
 	}
