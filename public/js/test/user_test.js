@@ -26,8 +26,7 @@ function test_login_password() {
 				test_assert(data != false);
 				ajax_post_sync({
 					'model': 'user', 
-					'method': 'delete_testuser', //Special method for testing
-					'password': 'testpass',
+					'method': 'delete_user',
 					'username': 'testuser'
 				}, function(data) {
 					test_assert(data == true);
@@ -51,6 +50,13 @@ function test_unique_username() {
 			'username': 'testuser'
 		}, function(data) {
 			test_assert(data == false);
+			ajax_post_sync({
+				'model': 'user', 
+				'method': 'delete_user',
+				'username': 'testuser'
+			}, function(data) {
+				test_assert(data == true);
+			});
 		});
 	});
 }

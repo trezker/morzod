@@ -22,9 +22,7 @@ struct Model_method {
 	void call(HTTPServerRequest req, HTTPServerResponse res, string[] user_access = []) {
 		//If any access matches any user_access, call method, else error.
 		//A method with empty access list is considered public.
-		//logInfo("delegate");
 		if(access.length == 0 || findAmong(access, user_access).length > 0) {
-			//logInfo("access");
 			method(req, res);
 		}
 		else {

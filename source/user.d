@@ -27,6 +27,10 @@ class User_model {
 			[],
 			&this.create_user
 		);
+		models["user"]["delete_user"] = Model_method(
+			[],
+			&this.delete_user
+		);
 	}
 
 	void get_current_user_id(HTTPServerRequest req, HTTPServerResponse res) {
@@ -70,6 +74,7 @@ class User_model {
 		if(rs.next())
 		{
 			res.writeJsonBody(false);
+			return;
 		}
 
 		//Create the user
@@ -83,6 +88,28 @@ class User_model {
 		prep.setString(1, username);
 		prep.setString(2, password);
 		prep.setString(3, salt);
+		prep.executeUpdate();
+
+		res.writeJsonBody(true);
+	}
+
+	void delete_user(HTTPServerRequest req, HTTPServerResponse res) {
+		string username = req.json.username.to!string;
+		//Method only for testing, in real usage users are never deleted.
+		if(username != "testuser")
+		{
+			res.writeJsonBody(true);
+			return;
+		}
+
+		auto conn = datasource.getConnection();
+		scope(exit) conn.close();
+
+		auto prep = conn.prepareStatement("
+			delete from user where name = ?
+		");
+		scope(exit) prep.close();
+		prep.setString(1, username);
 		prep.executeUpdate();
 
 		res.writeJsonBody(true);
