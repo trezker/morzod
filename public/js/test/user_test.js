@@ -1,3 +1,20 @@
+function create_testuser(callback) {
+	ajax_post_sync({
+		'model': 'user', 
+		'method': 'create_user',
+		'password': 'testpass',
+		'username': 'testuser'
+	}, callback);
+}
+
+function delete_testuser(callback) {
+	ajax_post_sync({
+		'model': 'user', 
+		'method': 'delete_user',
+		'username': 'testuser'
+	}, callback);
+}
+
 function test_logout() {
 	ajax_post_sync({'model': 'user', 'method': 'logout'}, function(data) {
 		test_assert(data == true);
@@ -8,12 +25,7 @@ function test_logout() {
 }
 
 function test_login_password() {
-	ajax_post_sync({
-		'model': 'user', 
-		'method': 'create_user',
-		'password': 'testpass',
-		'username': 'testuser'
-	}, function(data) {
+	create_testuser(function(data) {
 		test_assert(data == true);
 		ajax_post_sync({
 			'model': 'user', 
@@ -24,11 +36,7 @@ function test_login_password() {
 			test_assert(data == true);
 			ajax_post_sync({'model': 'user', 'method': 'get_current_user_id'}, function(data) {
 				test_assert(data != false);
-				ajax_post_sync({
-					'model': 'user', 
-					'method': 'delete_user',
-					'username': 'testuser'
-				}, function(data) {
+				delete_testuser(function(data) {
 					test_assert(data == true);
 				});
 			});
@@ -37,24 +45,10 @@ function test_login_password() {
 }
 
 function test_unique_username() {
-	ajax_post_sync({
-		'model': 'user', 
-		'method': 'create_user',
-		'password': 'testpass',
-		'username': 'testuser'
-	}, function(data) {
-		ajax_post_sync({
-			'model': 'user', 
-			'method': 'create_user',
-			'password': 'testpass',
-			'username': 'testuser'
-		}, function(data) {
+	create_testuser(function(data) {
+		create_testuser(function(data) {
 			test_assert(data == false);
-			ajax_post_sync({
-				'model': 'user', 
-				'method': 'delete_user',
-				'username': 'testuser'
-			}, function(data) {
+			delete_testuser(function(data) {
 				test_assert(data == true);
 			});
 		});

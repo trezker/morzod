@@ -43,10 +43,30 @@ class User_model {
 	}
 
 	void login_password(HTTPServerRequest req, HTTPServerResponse res) {
+		string username = req.json.username.to!string;
+		string password = req.json.password.to!string;
+
+		auto conn = datasource.getConnection();
+		scope(exit) conn.close();
+
+		auto prep = conn.prepareStatement("
+			select
+				id
+			FROM user
+			WHERE name = ?
+			AND Pass = SHA2(CONCAT(salt, ?), 512)
+		");
+
+		prep.setString(1, username);
+		prep.setString(2, password);
+		auto rs = prep.executeQuery();
+
+		if(!rs.next()) {
+			res.writeJsonBody(false);
+			return;
+		}
 		auto session = res.startSession();
-		session.set("id", 1);
-		//session.set("username", req.form["username"]);
-		//session.set("password", req.form["password"]);
+		session.set("id", rs.getInt("id"));
 		res.writeJsonBody(true);
 	}
 
@@ -82,12 +102,13 @@ class User_model {
 
 		prep = conn.prepareStatement("
 			insert into user(name, pass, salt)
-			values(?, ?, ?)
+			values(?, SHA2(CONCAT(?, ?), 512), ?)
 		");
 		scope(exit) prep.close();
 		prep.setString(1, username);
-		prep.setString(2, password);
-		prep.setString(3, salt);
+		prep.setString(2, salt);
+		prep.setString(3, password);
+		prep.setString(4, salt);
 		prep.executeUpdate();
 
 		res.writeJsonBody(true);
