@@ -3,6 +3,8 @@ module morzod.user;
 import vibe.http.server;
 import ddbc.core;
 import morzod.server;
+import vibe.core.log;
+import morzod.helpers;
 
 class User_model {
 	DataSource datasource;
@@ -23,7 +25,7 @@ class User_model {
 		);
 		models["user"]["create_user"] = Model_method(
 			[],
-			&this.logout
+			&this.create_user
 		);
 	}
 
@@ -52,29 +54,24 @@ class User_model {
 	}
 
 	void create_user(HTTPServerRequest req, HTTPServerResponse res) {
-		try {
-			string username = req.json.username.to!string;
-			string password = req.json.password.to!string;
+		string username = req.json.username.to!string;
+		string password = req.json.password.to!string;
 
-			auto conn = datasource.getConnection();
-			scope(exit) conn.close();
+		auto conn = datasource.getConnection();
+		scope(exit) conn.close();
+		
+		string salt = get_random_string(32);
 
-			auto prep = conn.prepareStatement("
-				insert into user(name, password)
-				values(?, ?)
-			");
-			scope(exit) prep.close();
-			prep.setString(1, username);
-			prep.setString(2, password);
-			auto rs = prep.executeUpdate();
+		auto prep = conn.prepareStatement("
+			insert into user(name, pass, salt)
+			values(?, ?, ?)
+		");
+		scope(exit) prep.close();
+		prep.setString(1, username);
+		prep.setString(2, password);
+		prep.setString(3, salt);
+		auto rs = prep.executeUpdate();
 
-			res.writeJsonBody(true);
-		}
-		catch(SQLException ex) {
-			res.writeJsonBody(false);
-		}
-		catch(Exception ex) {
-			res.writeJsonBody(false);
-		}
+		res.writeJsonBody(true);
 	}
 }

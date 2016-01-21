@@ -22,7 +22,9 @@ struct Model_method {
 	void call(HTTPServerRequest req, HTTPServerResponse res, string[] user_access = []) {
 		//If any access matches any user_access, call method, else error.
 		//A method with empty access list is considered public.
+		//logInfo("delegate");
 		if(access.length == 0 || findAmong(access, user_access).length > 0) {
+			//logInfo("access");
 			method(req, res);
 		}
 		else {
@@ -36,6 +38,7 @@ private:
 	DataSource datasource;
 	User_model user_model;
 	Model_method[string][string] models;
+	
 public:
 	bool setup() {
 		if(!databaseSetup()) {
@@ -97,29 +100,6 @@ public:
 			else {
 				res.writeJsonBody("Model/method does not exist");
 			}
-			/*
-			switch(func) {
-				case "get_user":
-					auto conn = datasource.getConnection();
-					scope(exit) conn.close();
-
-					auto prep = conn.prepareStatement("
-						select id, name, created 
-						from user 
-						where id=?;
-					");
-					scope(exit) prep.close();
-					prep.setUlong(1, 2);
-					auto rs = prep.executeQuery();
-
-					int name;
-					while (rs.next()) {
-						name = to!int(rs.getInt("id"));
-					}
-					res.writeJsonBody(name);
-					break;
-			}
-			*/
 		}
 		catch(Exception e) {
 			logInfo(e.msg);

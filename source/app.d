@@ -25,7 +25,7 @@ shared static this() {
 	auto router = new URLRouter;
 	router.get("/", &morzo_server.index);
 	router.get("/test", &morzo_server.test);
-	router.post("/ajax", &morzo_server.ajax);
+	router.post("/ajax*", &morzo_server.ajax);
 	router.get("/*", serveStaticFiles("./public/"));
 	
 	listenHTTP(settings, router);
