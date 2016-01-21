@@ -114,7 +114,9 @@ function test_unique_username() {
 	});
 }
 
-test_logout();
-test_invalid_login_password();
-test_login_password();
-test_unique_username();
+run_test_suite([
+	test_logout, 
+	test_invalid_login_password, 
+	test_login_password,
+	test_unique_username
+]);

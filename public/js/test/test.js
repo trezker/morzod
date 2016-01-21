@@ -18,3 +18,10 @@ function test_assert(cond) {
 		}
 	}
 }
+
+function run_test_suite(suite) {
+	for (var test in suite) {
+		console.log(suite[test]);
+		suite[test]();
+	}
+}
