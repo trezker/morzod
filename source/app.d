@@ -6,6 +6,7 @@ import vibe.core.log;
 import vibe.http.router;
 import vibe.http.fileserver;
 import morzod.server;
+import vibe.http.websockets : handleWebSockets;
 
 shared static this() {
 	auto morzo_server = new Morzo_server;
@@ -14,6 +15,9 @@ shared static this() {
 		if(!morzo_server.setup()) {
 			exit(-1);
 		}
+	});
+	runTask({
+		morzo_server.daemon();
 	});
 	
 	auto settings = new HTTPServerSettings;
@@ -26,6 +30,7 @@ shared static this() {
 	router.get("/", &morzo_server.index);
 	router.get("/test", &morzo_server.test);
 	router.post("/ajax*", &morzo_server.ajax);
+	router.get("/ws", handleWebSockets(&morzo_server.websocket));
 	router.get("/*", serveStaticFiles("./public/"));
 	
 	listenHTTP(settings, router);

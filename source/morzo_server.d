@@ -12,6 +12,9 @@ import std.file;
 import std.json;
 import std.functional;
 import std.conv;
+import vibe.http.websockets : WebSocket;
+import vibe.core.core : sleep;
+import core.time;
 
 alias Request_delegate = void delegate(HTTPServerRequest req, HTTPServerResponse res);
 struct Model_method {
@@ -101,6 +104,26 @@ public:
 		}
 		catch(Exception e) {
 			logInfo(e.msg);
+		}
+	}
+	
+	void websocket(scope WebSocket socket) {
+		int counter = 0;
+		logInfo("Got new web socket connection.");
+		while (true) {
+			sleep(1.seconds);
+			if (!socket.connected) break;
+			counter++;
+			logInfo("Sending '%s'.", counter);
+			socket.send(counter.to!string);
+		}
+		logInfo("Client disconnected.");
+	}
+
+	void daemon() {
+		while (true) {
+			sleep(1.seconds);
+			//logInfo("Daemon");
 		}
 	}
 }
