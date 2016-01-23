@@ -1,12 +1,15 @@
-#ticker_list div {
-	cursor: pointer;
-	margin-top: 5px;
+.flex-container {
+  display: flex;
+  background-color: lightgrey;
+  flex-flow: row wrap;
+  overflow: auto;
 }
 
-#ticker_list div.loaded {
-	background: #AAFFAA;
-}
-
-#ticker_list div.loading {
-	background: #AAAAFF;
+.flex-item {
+  background-color: cornflowerblue;
+  width: 100px;
+  height: 100px;
+  margin: auto;
+  border: 5px solid red;
+  flex-grow: 1;
 }
