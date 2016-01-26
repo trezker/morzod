@@ -1,0 +1,53 @@
+Create locations first, needed by actors.
+I'd like to have maps, procedurally generated with all elements.
+Generate heightmap through tectonic plate simulation
+Simulate rainfall, rivers, erosion, plant growth...
+Use generated map to place locations, connections, resources, possibilities...
+
+
+language(id, name)
+
+Should create actors before events
+
+token_type(id, name)
+["text", "actor", "location"]
+
+event_type(id, name)
+event_token(id, event_type_id, token, type_id)
+Example ("speaker", 2) ("message", 1)
+
+event_template(id, type_id, language_id, template)
+Examples
+speak, "%speaker% said: %message%"
+whisper, "%speaker% whispered to you: %message%"
+leave_location, "%actor% left %from_location% going towards %to_location%."
+%% tokens are replaced with relevant data items
+
+
+event(id, data, ingame_time, timestamp)
+An event has json encoded data used to construct the text shown to the actor.
+
+event_actor(id, event_id, actor_id)
+An event is visible to a collection of actors.
+
+Examples
+{
+	"template":"speak", 
+	"speaker":2,
+	"message":"Hello"
+}
+Receivers are everyone in the same location.
+
+{
+	"template":"whisper",
+	"speaker":2,
+	"message":"Hello"
+}
+Receivers are the actors chosen by the speaker.
+
+{
+	"template":"leave_location",
+	"actor": 2,
+	"from_location": 1,
+	"to_location": 2
+}

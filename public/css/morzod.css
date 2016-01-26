@@ -1,15 +1,23 @@
 .flex-container {
   display: flex;
-  background-color: lightgrey;
   flex-flow: row wrap;
-  overflow: auto;
 }
 
 .flex-item {
-  background-color: cornflowerblue;
   width: 100px;
   height: 100px;
   margin: auto;
-  border: 5px solid red;
+  border: 1px solid black;
   flex-grow: 1;
+}
+
+.mapgenerator {
+  flex-grow: 0;
+  width: 500px;
+  height: 500px;
+}
+
+.mapgenerator canvas {
+  width: 500px;
+  height: 500px;
 }
