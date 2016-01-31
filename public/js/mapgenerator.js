@@ -15,7 +15,19 @@ function load_mapgenerator() {
 		initShaders(globj);
 		initBuffers(globj);
 
-		var simInterval = setInterval(runsimulation, 10, globj);
+		$.getScript("/js/mapgenerator/map.js")
+		.done(function( script, textStatus ) {
+			var map = new Mapgen.Map();
+
+			while(map.run_stage()) {
+				console.log("render here");
+				map.render(globj);
+			}
+			console.log("render here");
+			map.render(globj);
+		});
+
+		//var simInterval = setInterval(runsimulation, 10, globj);
 	});
 }
 
