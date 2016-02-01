@@ -27,12 +27,12 @@ function load_mapgenerator() {
 			map.render(globj);
 		});
 
-		//var simInterval = setInterval(runsimulation, 10, globj);
+//		var simInterval = setInterval(runsimulation, 10, globj);
 	});
 }
 
 function runsimulation(globj) {
-	globj.x += 0.01;
+	globj.x += 0.1;
 	globj.drawScene(globj);
 }
 
@@ -53,9 +53,9 @@ function initBuffers(globj) {
     globj.triangleVertexPositionBuffer = gl.createBuffer();
 	gl.bindBuffer(gl.ARRAY_BUFFER, globj.triangleVertexPositionBuffer);
 	var vertices = [
-		 0.0,  1.0,  0.0,
-		-1.0, -1.0,  0.0,
-		 1.0, -1.0,  0.0
+		 0.0,  10.0,  0.0,
+		-10.0, -10.0,  0.0,
+		 10.0, -10.0,  0.0
 	];
 	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
 	globj.triangleVertexPositionBuffer.itemSize = 3;
@@ -64,10 +64,10 @@ function initBuffers(globj) {
 	globj.squareVertexPositionBuffer = gl.createBuffer();
 	gl.bindBuffer(gl.ARRAY_BUFFER, globj.squareVertexPositionBuffer);
 	vertices = [
-		 1.0,  1.0,  0.0,
-		-1.0,  1.0,  0.0,
-		 1.0, -1.0,  0.0,
-		-1.0, -1.0,  0.0
+		 10.0,  10.0,  0.0,
+		-10.0,  10.0,  0.0,
+		 10.0, -10.0,  0.0,
+		-10.0, -10.0,  0.0
 	];
 	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
 	globj.squareVertexPositionBuffer.itemSize = 3;
@@ -87,15 +87,16 @@ function drawScene(globj) {
 
 	gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-    mat4.perspective(globj.pMatrix, 45, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0);
+    //mat4.perspective(globj.pMatrix, 45, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0);
+    mat4.ortho(globj.pMatrix, 0, 512, 512, 0, 0.0, 10);
     mat4.identity(globj.mvMatrix);
-    //mat4.translate(mvMatrix, [-1.5, 0.0, -7.0]);
-    mat4.translate(globj.mvMatrix, globj.mvMatrix, [-1.5 + globj.x, 0.0, -7.0]);
+    mat4.translate(globj.mvMatrix, globj.mvMatrix, [globj.x, globj.x, 0.0]);
+    mat4.translate(globj.mvMatrix, globj.mvMatrix, [-15, 0.0, 0.0]);
     gl.bindBuffer(gl.ARRAY_BUFFER, globj.triangleVertexPositionBuffer);
     gl.vertexAttribPointer(globj.shaderProgram.vertexPositionAttribute, globj.triangleVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
     setMatrixUniforms(globj);
     gl.drawArrays(gl.TRIANGLES, 0, globj.triangleVertexPositionBuffer.numItems);
-    mat4.translate(globj.mvMatrix, globj.mvMatrix, [3.0 + globj.x, 0.0, 0.0]);
+    mat4.translate(globj.mvMatrix, globj.mvMatrix, [30, 0.0, 0.0]);
     gl.bindBuffer(gl.ARRAY_BUFFER, globj.squareVertexPositionBuffer);
     gl.vertexAttribPointer(globj.shaderProgram.vertexPositionAttribute, globj.squareVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
     setMatrixUniforms(globj);
@@ -108,10 +109,7 @@ function initShaders(globj) {
 	if($("#shader-fs").length === 0) {
 		var shader1 = `
 			<script id="shader-fs" type="x-shader/x-fragment">
-				precision mediump float;
-
 				void main(void) {
-					gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
 				}
 			</script>`;
 		var shader2 = `
@@ -142,6 +140,7 @@ function initShaders(globj) {
     }
 
     gl.useProgram(globj.shaderProgram);
+    
 	globj.shaderProgram.vertexPositionAttribute = gl.getAttribLocation(globj.shaderProgram, "aVertexPosition");
     gl.enableVertexAttribArray(globj.shaderProgram.vertexPositionAttribute);
     globj.shaderProgram.pMatrixUniform = gl.getUniformLocation(globj.shaderProgram, "uPMatrix");
