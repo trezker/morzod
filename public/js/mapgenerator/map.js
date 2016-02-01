@@ -19,17 +19,15 @@ Mapgen.Map = function () {
 			function(map, globj) {
 				var gl = globj.gl;
 
+				//Prepare data for rendering
 			    var points = [];
 		    	for(var p in map.points) {
 		    		points.push(map.points[p].x);
 		    		points.push(map.points[p].y);
 		    		points.push(0);
 		    	}
-				var vertex_buffer = gl.createBuffer();
-				gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer);
-				gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(points), gl.STATIC_DRAW);
-				gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
+	    		//Initialize shaders
 				var vertCode = 'attribute vec3 aVertexPosition;'+
 					'uniform mat4 uMVMatrix;'+
 					'uniform mat4 uPMatrix;'+
@@ -42,25 +40,34 @@ Mapgen.Map = function () {
 					'}';
 				globj.shaderProgram = createShaderProgram(gl, vertCode, fragCode);
 				gl.useProgram(globj.shaderProgram);
-				globj.shaderProgram.vertexPositionAttribute = gl.getAttribLocation(globj.shaderProgram, "aVertexPosition");
-			    gl.enableVertexAttribArray(globj.shaderProgram.vertexPositionAttribute);
-			    globj.shaderProgram.pMatrixUniform = gl.getUniformLocation(globj.shaderProgram, "uPMatrix");
-			    globj.shaderProgram.mvMatrixUniform = gl.getUniformLocation(globj.shaderProgram, "uMVMatrix");
 
-				/*======== Associating shaders to buffer objects ========*/
-				gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer);
-				gl.vertexAttribPointer(globj.shaderProgram.vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
-
-				/*============= Drawing the primitive ===============*/
+				//Setup view and clear it
 				gl.clearColor(0.9, 0.9, 0.9, 1);
 				gl.enable(gl.DEPTH_TEST);
 				gl.clear(gl.COLOR_BUFFER_BIT);
 				gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
 
+				//Set up perspective
 				mat4.ortho(globj.pMatrix, 0, map.size, map.size, 0, 0.0, 10);
+
+				//Set up transformation
 				mat4.identity(globj.mvMatrix);
-				setMatrixUniforms(globj);
+				
+				//Set projection and transformation
+			    var pMatrixUniform = gl.getUniformLocation(globj.shaderProgram, "uPMatrix");
+			    var mvMatrixUniform = gl.getUniformLocation(globj.shaderProgram, "uMVMatrix");
+				gl.uniformMatrix4fv(pMatrixUniform, false, globj.pMatrix);
+				gl.uniformMatrix4fv(mvMatrixUniform, false, globj.mvMatrix);
+
+				//Setup buffer and draw
+				var vertex_buffer = gl.createBuffer();
+				gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer);
+				gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(points), gl.STATIC_DRAW);
+				var vertexPositionAttribute = gl.getAttribLocation(globj.shaderProgram, "aVertexPosition");
+				gl.vertexAttribPointer(vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
+			    gl.enableVertexAttribArray(vertexPositionAttribute);
 				gl.drawArrays(gl.POINTS, 0, map.points.length);
+				gl.bindBuffer(gl.ARRAY_BUFFER, null);
 			}
 		]
 	];
