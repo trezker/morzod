@@ -26,6 +26,18 @@ Mapgen.Map = function () {
 		    		points.push(map.points[p].y);
 		    		points.push(0);
 		    	}
+				var voronoi = new Voronoi();
+				var diagram = voronoi.compute(map.points, {xl: 0, xr: map.size, yt: 0, yb: map.size});
+				var edges = [];
+				for(var e in diagram.edges) {
+					var ed = diagram.edges[e];
+					edges.push(ed.va.x);
+					edges.push(ed.va.y);
+					edges.push(0);
+					edges.push(ed.vb.x);
+					edges.push(ed.vb.y);
+					edges.push(0);
+				}
 
 	    		//Initialize shaders
 				var vertCode = 'attribute vec3 aVertexPosition;'+
@@ -59,7 +71,7 @@ Mapgen.Map = function () {
 				gl.uniformMatrix4fv(pMatrixUniform, false, globj.pMatrix);
 				gl.uniformMatrix4fv(mvMatrixUniform, false, globj.mvMatrix);
 
-				//Setup buffer and draw
+				//Setup buffer and draw points
 				var vertex_buffer = gl.createBuffer();
 				gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer);
 				gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(points), gl.STATIC_DRAW);
@@ -67,6 +79,16 @@ Mapgen.Map = function () {
 				gl.vertexAttribPointer(vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
 			    gl.enableVertexAttribArray(vertexPositionAttribute);
 				gl.drawArrays(gl.POINTS, 0, map.points.length);
+				gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
+				//Setup buffer and draw edges
+				var edge_buffer = gl.createBuffer();
+				gl.bindBuffer(gl.ARRAY_BUFFER, edge_buffer);
+				gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(edges), gl.STATIC_DRAW);
+				var vertexPositionAttribute = gl.getAttribLocation(globj.shaderProgram, "aVertexPosition");
+				gl.vertexAttribPointer(vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
+			    gl.enableVertexAttribArray(vertexPositionAttribute);
+				gl.drawArrays(gl.LINES, 0, diagram.edges.length * 2);
 				gl.bindBuffer(gl.ARRAY_BUFFER, null);
 			}
 		]
