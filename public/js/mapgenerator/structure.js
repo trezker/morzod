@@ -17,6 +17,12 @@ Mapgen.Point.prototype.divide = function (s) {
 	this.y /= s;
 };
 
+Mapgen.Point.prototype.interpolate = function (p, f) {
+	var x = this.x + (p.x - this.x) * f;
+	var y = this.y + (p.y - this.y) * f;
+	return new Mapgen.Point(x, y);
+};
+
 Mapgen.Corner = function() {
 	this.index = 0;
 
@@ -39,9 +45,11 @@ Mapgen.Corner = function() {
 };
 
 Mapgen.Center = function() {
+	console.log("c1");
 	this.index = 0;
 
 	this.point = new Mapgen.Point(0, 0);  // location
+	console.log("c2");
 	this.water = false;  // lake or ocean
 	this.ocean = false;  // ocean
 	this.coast = false;  // land polygon touching an ocean
@@ -53,6 +61,7 @@ Mapgen.Center = function() {
 	this.neighbors = []; //Centers
 	this.borders = []; //Edges
 	this.corners = []; //Corners
+	console.log("c3");
 };
 
 Mapgen.Edge = function() {
